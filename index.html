@@ -1,39 +1,69 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="uz">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login/Sign Up UI</title>
-  <link rel="stylesheet" href="main.css">
+    <meta charset="UTF-8">
+    <title>Giveaway Randomizer</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        #winner {
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 18px;
+            color: green;
+        }
+    </style>
 </head>
-
 <body>
-  <div class="container">
-    <div class="form-wrap">
-      <form>
-        <h2>Log In</h2>
-        <div class="social-icons">
-          <a href="/"><img src="https://img.icons8.com/ios-filled/20/000000/google-logo.png"></a>
-          <a href="/"><img src="https://img.icons8.com/ios-filled/20/000000/facebook.png"></a>
-          <a href="/"><img src="https://img.icons8.com/ios-filled/20/000000/instagram-new.png"></a>
-          <a href="/"><img src="https://img.icons8.com/ios-filled/20/000000/linkedin.png"></a>
-        </div>
-        <p>or use your email for registration</p>
-        <input type="text" placeholder="Name">
-        <input type="email" placeholder="Email">
-        <input type="password" placeholder="Password">
-        <button class="sign-in">SIGN IN</button>
-      </form>
-    </div>
-    <div class="hello">
-      <h2>Hello Users!</h2>
-      <p>Create an account to unlock all the features and <br> personalized content waiting for you.</p>
-      <div class="btn-wrap">
-      <button class="sign-up">SIGN UP</button>
-      </div>
-    </div>
-  </div>
-</body>
 
+    <h2>🎁 Giveaway Randomizer</h2>
+    <p>Ishtirokchilar ro'yxatini kiriting (har bir ishtirokchini yangi qatordan yozing):</p>
+    
+    <textarea id="participants" placeholder="Ali\nVali\nSami"></textarea><br>
+    <button onclick="selectWinner()">🎉 G‘olibni tanlash</button>
+
+    <div id="winner"></div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        function selectWinner() {
+            const textarea = document.getElementById("participants");
+            const participants = textarea.value
+                .split("\n")
+                .map(name => name.trim())
+                .filter(name => name.length > 0);
+
+            if (participants.length === 0) {
+                alert("Iltimos, kamida 1 ta ishtirokchini kiriting.");
+                return;
+            }
+
+            const winner = participants[Math.floor(Math.random() * participants.length)];
+
+            document.getElementById("winner").innerText = `🎉 G‘olib: ${winner}`;
+
+            const result = {
+                winner: winner,
+                all: participants
+            };
+
+            tg.sendData(JSON.stringify(result));
+        }
+    </script>
+
+</body>
 </html>
