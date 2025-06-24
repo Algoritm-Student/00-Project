@@ -1,62 +1,89 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uz">
 <head>
-  <meta charset="UTF-8" />
-  <title>Plinko O‘yini</title>
+  <meta charset="UTF-8">
+  <title>Captcha tekshiruvi</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     body {
       font-family: sans-serif;
       text-align: center;
-      padding: 20px;
+      padding: 30px;
+    }
+    .captcha {
+      font-size: 32px;
+      letter-spacing: 5px;
+      margin-bottom: 10px;
+      font-weight: bold;
+      color: darkred;
+    }
+    input {
+      padding: 10px;
+      font-size: 18px;
+      width: 200px;
+      margin-top: 10px;
     }
     button {
-      padding: 15px 30px;
+      padding: 10px 20px;
       font-size: 18px;
-      margin-top: 30px;
-    }
-    #result {
       margin-top: 20px;
-      font-size: 24px;
-      font-weight: bold;
+    }
+    .error {
+      color: red;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <h2>🎯 Plinko O‘yini</h2>
-  <p>To‘pni tushiring va yutuqni aniqlang!</p>
+  <h2>🤖 CAPTCHA Tekshiruvi</h2>
+  <p>Iltimos, quyidagi kodni to‘g‘ri kiriting:</p>
 
-  <button onclick="play()">⬇️ Tushirish</button>
+  <div id="captcha" class="captcha"></div>
 
-  <div id="result"></div>
+  <input type="text" id="userInput" placeholder="Kod..." />
+  <button onclick="checkCaptcha()">Yuborish</button>
+
+  <div class="error" id="error"></div>
 
   <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    function play() {
-      const coinUsed = 10;
-      const rand = Math.random();
+    const generateCaptcha = () => {
+      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ123456789";
+      let code = "";
+      for (let i = 0; i < 5; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return code;
+    };
 
-      let resultText = "";
-      let resultObj = { result: "lose", amount: coinUsed };
+    const captchaCode = generateCaptcha();
+    document.getElementById("captcha").innerText = captchaCode;
 
-      if (rand < 0.2) {
-        resultText = "🎉 Siz 50 coin yutdingiz!";
-        resultObj = { result: "win", amount: 50 };
-      } else if (rand < 0.5) {
-        resultText = "🎊 Siz 20 coin yutdingiz!";
-        resultObj = { result: "win", amount: 20 };
-      } else {
-        resultText = "😢 Afsus, yutqazdingiz (-10 coin)";
-        resultObj = { result: "lose", amount: coinUsed };
+    async function getIP() {
+      const res = await fetch("https://api.ipify.org?format=json");
+      const data = await res.json();
+      return data.ip;
+    }
+
+    async function checkCaptcha() {
+      const input = document.getElementById("userInput").value.trim().toUpperCase();
+      const error = document.getElementById("error");
+
+      if (input !== captchaCode) {
+        error.innerText = "❌ Noto‘g‘ri captcha!";
+        return;
       }
 
-      document.getElementById("result").innerText = resultText;
+      const ip = await getIP();
+      const result = {
+        ip: ip,
+        captcha: input,
+        ok: true
+      };
 
-      setTimeout(() => {
-        tg.sendData(JSON.stringify(resultObj));
-      }, 1000);
+      tg.sendData(JSON.stringify(result));
     }
   </script>
 </body>
