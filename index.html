@@ -1,69 +1,63 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Giveaway Randomizer</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        body {
-            font-family: sans-serif;
-            padding: 20px;
-        }
-        textarea {
-            width: 100%;
-            height: 150px;
-        }
-        button {
-            margin-top: 10px;
-            padding: 10px 20px;
-            font-size: 16px;
-        }
-        #winner {
-            margin-top: 20px;
-            font-weight: bold;
-            font-size: 18px;
-            color: green;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Plinko O‘yini</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    button {
+      padding: 15px 30px;
+      font-size: 18px;
+      margin-top: 30px;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
+  <h2>🎯 Plinko O‘yini</h2>
+  <p>To‘pni tushiring va yutuqni aniqlang!</p>
 
-    <h2>🎁 Giveaway Randomizer</h2>
-    <p>Ishtirokchilar ro'yxatini kiriting (har bir ishtirokchini yangi qatordan yozing):</p>
-    
-    <textarea id="participants" placeholder="Ali\nVali\nSami"></textarea><br>
-    <button onclick="selectWinner()">🎉 G‘olibni tanlash</button>
+  <button onclick="play()">⬇️ Tushirish</button>
 
-    <div id="winner"></div>
+  <div id="result"></div>
 
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
 
-        function selectWinner() {
-            const textarea = document.getElementById("participants");
-            const participants = textarea.value
-                .split("\n")
-                .map(name => name.trim())
-                .filter(name => name.length > 0);
+    function play() {
+      const coinUsed = 10;
+      const rand = Math.random();
 
-            if (participants.length === 0) {
-                alert("Iltimos, kamida 1 ta ishtirokchini kiriting.");
-                return;
-            }
+      let resultText = "";
+      let resultObj = { result: "lose", amount: coinUsed };
 
-            const winner = participants[Math.floor(Math.random() * participants.length)];
+      if (rand < 0.2) {
+        resultText = "🎉 Siz 50 coin yutdingiz!";
+        resultObj = { result: "win", amount: 50 };
+      } else if (rand < 0.5) {
+        resultText = "🎊 Siz 20 coin yutdingiz!";
+        resultObj = { result: "win", amount: 20 };
+      } else {
+        resultText = "😢 Afsus, yutqazdingiz (-10 coin)";
+        resultObj = { result: "lose", amount: coinUsed };
+      }
 
-            document.getElementById("winner").innerText = `🎉 G‘olib: ${winner}`;
+      document.getElementById("result").innerText = resultText;
 
-            const result = {
-                winner: winner,
-                all: participants
-            };
-
-            tg.sendData(JSON.stringify(result));
-        }
-    </script>
-
+      setTimeout(() => {
+        tg.sendData(JSON.stringify(resultObj));
+      }, 1000);
+    }
+  </script>
 </body>
 </html>
