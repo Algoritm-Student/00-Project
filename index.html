@@ -6,6 +6,47 @@
   <title>Gacha Game</title>
   <link rel="stylesheet" href="main.css" />
 </head>
+
+  <script src="https://telegram.org/js/telegram-web-app.js">
+    let remaining = 3;
+let coins = 1050;
+
+function openChest(id) {
+  if (remaining <= 0) return alert("No attempts left!");
+
+  remaining--;
+  document.getElementById("remaining").innerText = `${remaining} / 3`;
+
+  const reward = Math.floor(Math.random() * 4);
+  let msg = "", delta = 0;
+
+  switch (reward) {
+    case 0:
+      delta = 100;
+      msg = "🎉 You won 100 coins!";
+      break;
+    case 1:
+      delta = 0;
+      msg = "😕 Empty chest!";
+      break;
+    case 2:
+      delta = -200;
+      msg = "💥 Bomb! Lost 200 coins!";
+      break;
+    case 3:
+      delta = 500;
+      msg = "🌟 RARE! +500 coins!";
+      break;
+  }
+
+  coins += delta;
+  if (coins < 0) coins = 0;
+
+  document.getElementById("coin-count").innerText = coins;
+  alert(msg);
+}
+
+  </script>
 <body>
   <div class="container">
     <h1>Gacha</h1>
