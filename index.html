@@ -1,90 +1,37 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Captcha tekshiruvi</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      padding: 30px;
-    }
-    .captcha {
-      font-size: 32px;
-      letter-spacing: 5px;
-      margin-bottom: 10px;
-      font-weight: bold;
-      color: darkred;
-    }
-    input {
-      padding: 10px;
-      font-size: 18px;
-      width: 200px;
-      margin-top: 10px;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 18px;
-      margin-top: 20px;
-    }
-    .error {
-      color: red;
-      margin-top: 10px;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gacha Game</title>
+  <link rel="stylesheet" href="main.css" />
 </head>
 <body>
-  <h2>🤖 CAPTCHA Tekshiruvi</h2>
-  <p>Iltimos, quyidagi kodni to‘g‘ri kiriting:</p>
+  <div class="container">
+    <h1>Gacha</h1>
+    
+    <div class="profile">
+      <div class="user">
+        <img src="https://via.placeholder.com/40" alt="Avatar" />
+        <span id="username">User</span>
+      </div>
+      <div class="coins">
+        <img src="https://cdn-icons-png.flaticon.com/512/263/263142.png" width="20"/>
+        <span id="coin-count">1050</span>
+      </div>
+    </div>
 
-  <div id="captcha" class="captcha"></div>
+    <div class="chests">
+      <div class="chest" onclick="openChest(1)">🧰<button>OPEN</button></div>
+      <div class="chest" onclick="openChest(2)">🧰<button>OPEN</button></div>
+      <div class="chest" onclick="openChest(3)">🧰<button>OPEN</button></div>
+    </div>
 
-  <input type="text" id="userInput" placeholder="Kod..." />
-  <button onclick="checkCaptcha()">Yuborish</button>
+    <div class="attempts">
+      <span id="remaining">3 / 3</span>
+    </div>
+  </div>
 
-  <div class="error" id="error"></div>
-
-  <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
-
-    const generateCaptcha = () => {
-      const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ123456789";
-      let code = "";
-      for (let i = 0; i < 5; i++) {
-        code += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      return code;
-    };
-
-    const captchaCode = generateCaptcha();
-    document.getElementById("captcha").innerText = captchaCode;
-
-    async function getIP() {
-      const res = await fetch("https://api.ipify.org?format=json");
-      const data = await res.json();
-      return data.ip;
-    }
-
-    async function checkCaptcha() {
-      const input = document.getElementById("userInput").value.trim().toUpperCase();
-      const error = document.getElementById("error");
-
-      if (input !== captchaCode) {
-        error.innerText = "❌ Noto‘g‘ri captcha!";
-        return;
-      }
-
-      const ip = await getIP();
-      const result = {
-        ip: ip,
-        captcha: input,
-        ok: true
-      };
-
-      tg.sendData(JSON.stringify(result));
-    }
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
