@@ -4,53 +4,65 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Gacha Game</title>
-  <link rel="stylesheet" href="main.css" />
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #0b0f1a;
+      color: white;
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      text-align: center;
+      padding: 30px;
+      max-width: 400px;
+    }
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 20px;
+    }
+    .profile {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+    }
+    .user { display: flex; align-items: center; gap: 10px; }
+    .coins { display: flex; align-items: center; gap: 6px; font-weight: bold; color: #f9ca24; }
+    .chests {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .chest {
+      background: #1e272e;
+      padding: 10px;
+      border-radius: 10px;
+      width: 80px;
+      height: 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .chest button {
+      margin-top: 8px;
+      background: #485460;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .attempts { font-size: 1.2em; }
+  </style>
 </head>
-
-  <script src="https://telegram.org/js/telegram-web-app.js">
-    let remaining = 3;
-let coins = 1050;
-
-function openChest(id) {
-  if (remaining <= 0) return alert("No attempts left!");
-
-  remaining--;
-  document.getElementById("remaining").innerText = `${remaining} / 3`;
-
-  const reward = Math.floor(Math.random() * 4);
-  let msg = "", delta = 0;
-
-  switch (reward) {
-    case 0:
-      delta = 100;
-      msg = "🎉 You won 100 coins!";
-      break;
-    case 1:
-      delta = 0;
-      msg = "😕 Empty chest!";
-      break;
-    case 2:
-      delta = -200;
-      msg = "💥 Bomb! Lost 200 coins!";
-      break;
-    case 3:
-      delta = 500;
-      msg = "🌟 RARE! +500 coins!";
-      break;
-  }
-
-  coins += delta;
-  if (coins < 0) coins = 0;
-
-  document.getElementById("coin-count").innerText = coins;
-  alert(msg);
-}
-
-  </script>
-<body>
+<body onload="init()">
   <div class="container">
     <h1>Gacha</h1>
-    
     <div class="profile">
       <div class="user">
         <img src="https://via.placeholder.com/40" alt="Avatar" />
@@ -58,21 +70,63 @@ function openChest(id) {
       </div>
       <div class="coins">
         <img src="https://cdn-icons-png.flaticon.com/512/263/263142.png" width="20"/>
-        <span id="coin-count">1050</span>
+        <span id="coin-count">1000</span>
       </div>
     </div>
 
     <div class="chests">
-      <div class="chest" onclick="openChest(1)">🧰<button>OPEN</button></div>
-      <div class="chest" onclick="openChest(2)">🧰<button>OPEN</button></div>
-      <div class="chest" onclick="openChest(3)">🧰<button>OPEN</button></div>
+      <div class="chest" onclick="openChest()">🧰<button>OPEN</button></div>
+      <div class="chest" onclick="openChest()">🧰<button>OPEN</button></div>
+      <div class="chest" onclick="openChest()">🧰<button>OPEN</button></div>
     </div>
 
-    <div class="attempts">
-      <span id="remaining">3 / 3</span>
-    </div>
+    <div class="attempts"><span id="remaining">3 / 3</span></div>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    let remaining = 3;
+    let coins = 1000;
+    let tg = null;
+
+    function init() {
+      tg = window.Telegram.WebApp;
+      const user = tg.initDataUnsafe?.user;
+      if (user) {
+        document.getElementById("username").innerText = user.first_name;
+        tg.expand();
+      } else {
+        alert("Telegram Web App orqali kiring.");
+      }
+    }
+
+    function openChest() {
+      if (remaining <= 0) return alert("❌ Imkon tugadi");
+
+      remaining--;
+      document.getElementById("remaining").innerText = `${remaining} / 3`;
+
+      const reward = Math.floor(Math.random() * 4);
+      let msg = "", delta = 0;
+
+      switch (reward) {
+        case 0: delta = 100; msg = "🎉 100 coin yutdingiz!"; break;
+        case 1: delta = 0; msg = "😐 Bo‘sh sandıq."; break;
+        case 2: delta = -200; msg = "💣 Bomba! 200 coin yo‘qotdingiz!"; break;
+        case 3: delta = 500; msg = "🌟 RARE! 500 coin!"; break;
+      }
+
+      coins += delta;
+      if (coins < 0) coins = 0;
+      document.getElementById("coin-count").innerText = coins;
+      alert(msg);
+
+      if (tg) {
+        tg.sendData(JSON.stringify({
+          action: "update_coin",
+          coins: coins
+        }));
+      }
+    }
+  </script>
 </body>
 </html>
